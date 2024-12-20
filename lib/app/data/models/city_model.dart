@@ -1,16 +1,16 @@
-class City {
+class CityModel {
   final String name;
   final String state;
   final String stateAcronym;
 
-  City({
+  CityModel({
     required this.name,
     required this.state,
     required this.stateAcronym,
   });
 
-  factory City.fromJson(Map<String, dynamic> json) {
-    return City(
+  factory CityModel.fromJson(Map<String, dynamic> json) {
+    return CityModel(
       name: json['nome'] ?? '',
       state: json['microrregiao']['mesorregiao']['UF']['nome'] ?? '',
       stateAcronym: json['microrregiao']['mesorregiao']['UF']['sigla'] ?? '',
