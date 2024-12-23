@@ -6,7 +6,8 @@ class CitiesUseCase {
 
   CitiesUseCase(this._repository);
 
-  Future<List<CityModel>> loadCities() async {
-    return await _repository.loadCities();
+  Future<List<CityModel>> loadCities(
+      {required int start, required int limit}) async {
+    return await _repository.loadCities(start: start, limit: limit);
   }
 }
