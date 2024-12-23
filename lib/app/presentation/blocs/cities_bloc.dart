@@ -43,32 +43,34 @@ class CitiesBloc extends Cubit<CityState> {
     fetchCities();
   }
 
-  Future<void> fetchCities() async {
-    if (state.hasReachedMax) return;
-
+  Future<void> fetchCities({bool forceRefresh = false}) async {
     emit(state.copyWith(status: CityStatus.loading));
+
     try {
-      final newCities = await _citiesUseCase.loadCities(
+      if (forceRefresh) {
+        await _citiesUseCase.refreshCache();
+      }
+      final cities = await _citiesUseCase.loadCities(
         start: _currentBatch * _batchSize,
         limit: _batchSize,
       );
 
-      final hasReachedMax = newCities.length < _batchSize;
+      final hasReachedMax = cities.length < _batchSize;
 
-      emit(
-        state.copyWith(
-          status: CityStatus.success,
-          cities: List.of(state.cities)..addAll(newCities),
-          hasReachedMax: hasReachedMax,
-        ),
-      );
+      emit(state.copyWith(
+        status: CityStatus.success,
+        cities: List.of(state.cities)..addAll(cities),
+        hasReachedMax: hasReachedMax,
+      ));
 
       _currentBatch++;
     } catch (e) {
-      emit(state.copyWith(
-        status: CityStatus.failure,
-        errorMessage: e.toString(),
-      ));
+      emit(
+        state.copyWith(
+          status: CityStatus.failure,
+          errorMessage: e.toString(),
+        ),
+      );
     }
   }
 }

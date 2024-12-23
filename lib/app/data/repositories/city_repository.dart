@@ -1,28 +1,47 @@
 import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
-import 'package:municipalities/app/data/models/city_model.dart';
-import 'package:municipalities/app/data/repositories/i_city_repository.dart';
+import 'package:hive/hive.dart';
+import '../models/city_model.dart';
 
-class CityRepositories implements ICityRepository {
+class CityRepositories {
   final _injector = GetIt.instance;
-  List<CityModel> _allCities = [];
+  final _box = Hive.box('citiesCache');
 
-  @override
   Future<List<CityModel>> loadCities({
     required int start,
     required int limit,
   }) async {
-    if (_allCities.isEmpty) {
-      final dio = _injector<Dio>();
-      final response = await dio.get("municipios");
-      _allCities = (response.data as List)
-          .map((json) => CityModel.fromJson(json))
-          .toList();
+    if (_box.isNotEmpty) {
+      final cachedCities =
+          _box.get('cities', defaultValue: []).cast<CityModel>();
+      return cachedCities.sublist(
+        start,
+        (start + limit > cachedCities.length)
+            ? cachedCities.length
+            : start + limit,
+      );
     }
 
-    return _allCities.sublist(
+    final List<CityModel> cities = await _fetchFromApi();
+
+    await _box.put('cities', cities);
+
+    return cities.sublist(
       start,
-      (start + limit > _allCities.length) ? _allCities.length : start + limit,
+      (start + limit > cities.length) ? cities.length : start + limit,
     );
+  }
+
+  Future<List<CityModel>> _fetchFromApi() async {
+    final dio = _injector<Dio>();
+    final response = await dio.get("municipios");
+    return (response.data as List)
+        .map((json) => CityModel.fromJson(json))
+        .toList();
+  }
+
+  Future<void> refreshCache() async {
+    final List<CityModel> cities = await _fetchFromApi();
+    await _box.put('cities', cities);
   }
 }
