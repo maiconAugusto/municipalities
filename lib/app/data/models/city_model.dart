@@ -16,11 +16,19 @@ class CityModel extends HiveObject {
   @HiveField(3)
   final int id;
 
+  @HiveField(4)
+  final String microregion;
+
+  @HiveField(5)
+  final String mesoregion;
+
   CityModel({
     required this.name,
     required this.state,
     required this.stateAcronym,
     required this.id,
+    required this.microregion,
+    required this.mesoregion,
   });
 
   factory CityModel.fromJson(Map<String, dynamic> json) {
@@ -29,6 +37,8 @@ class CityModel extends HiveObject {
       name: json['nome'],
       state: json['microrregiao']['mesorregiao']['UF']['nome'],
       stateAcronym: json['microrregiao']['mesorregiao']['UF']['sigla'],
+      microregion: json['microrregiao']['nome'],
+      mesoregion: json['microrregiao']['mesorregiao']['nome'],
     );
   }
 
@@ -37,7 +47,9 @@ class CityModel extends HiveObject {
       'id': id,
       'nome': name,
       'microrregiao': {
+        'nome': microregion,
         'mesorregiao': {
+          'nome': mesoregion,
           'UF': {
             'nome': state,
             'sigla': stateAcronym,

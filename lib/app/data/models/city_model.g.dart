@@ -21,13 +21,15 @@ class CityModelAdapter extends TypeAdapter<CityModel> {
       state: fields[1] as String,
       stateAcronym: fields[2] as String,
       id: fields[3] as int,
+      microregion: fields[4] as String,
+      mesoregion: fields[5] as String,
     );
   }
 
   @override
   void write(BinaryWriter writer, CityModel obj) {
     writer
-      ..writeByte(4)
+      ..writeByte(6)
       ..writeByte(0)
       ..write(obj.name)
       ..writeByte(1)
@@ -35,7 +37,11 @@ class CityModelAdapter extends TypeAdapter<CityModel> {
       ..writeByte(2)
       ..write(obj.stateAcronym)
       ..writeByte(3)
-      ..write(obj.id);
+      ..write(obj.id)
+      ..writeByte(4)
+      ..write(obj.microregion)
+      ..writeByte(5)
+      ..write(obj.mesoregion);
   }
 
   @override
