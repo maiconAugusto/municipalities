@@ -34,7 +34,23 @@ class _MunicipioListPageState extends State<MunicipioListPage> {
           if (state.status == CityStatus.loading && state.cities.isEmpty) {
             return const Center(child: CircularProgressIndicator());
           } else if (state.status == CityStatus.failure) {
-            return Center(child: Text('Erro: ${state.errorMessage}'));
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text('${state.errorMessage}'),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      context.read<CitiesBloc>().fetchCities();
+                    },
+                    child: const Text('Tentar novamente'),
+                  ),
+                ],
+              ),
+            );
           }
 
           return ListView.builder(

@@ -39,7 +39,7 @@ class CityRepositories {
           dioError.response?.statusCode == 500) {
         throw Exception('Erro no servidor');
       } else {
-        throw Exception('Erro ao se comunicar com a API: ${dioError.message}');
+        throw Exception('Erro ao se comunicar com os serviço');
       }
     } catch (e) {
       throw Exception('Erro ao buscar municípios');

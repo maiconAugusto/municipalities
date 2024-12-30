@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:municipalities/app/data/models/city_model.dart';
 import 'package:municipalities/app/domain/use_cases/cities_use_case.dart';
@@ -65,10 +66,16 @@ class CitiesBloc extends Cubit<CityState> {
 
       _currentBatch++;
     } catch (e) {
+      String? errorMessage;
+      if (e is DioException) {
+        errorMessage = e.message;
+      } else if (e is Exception) {
+        errorMessage = e.toString().replaceFirst('Exception: ', '');
+      }
       emit(
         state.copyWith(
           status: CityStatus.failure,
-          errorMessage: e.toString(),
+          errorMessage: errorMessage,
         ),
       );
     }
