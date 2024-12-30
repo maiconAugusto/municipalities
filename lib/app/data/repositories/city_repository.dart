@@ -11,25 +11,39 @@ class CityRepositories {
     required int start,
     required int limit,
   }) async {
-    if (_box.isNotEmpty) {
-      final cachedCities =
-          _box.get('cities', defaultValue: []).cast<CityModel>();
-      return cachedCities.sublist(
+    try {
+      if (_box.isNotEmpty) {
+        final cachedCities =
+            _box.get('cities', defaultValue: []).cast<CityModel>();
+        return cachedCities.sublist(
+          start,
+          (start + limit > cachedCities.length)
+              ? cachedCities.length
+              : start + limit,
+        );
+      }
+
+      final List<CityModel> cities = await _fetchFromApi();
+
+      await _box.put('cities', cities);
+
+      return cities.sublist(
         start,
-        (start + limit > cachedCities.length)
-            ? cachedCities.length
-            : start + limit,
+        (start + limit > cities.length) ? cities.length : start + limit,
       );
+    } on DioException catch (dioError) {
+      if (dioError.type == DioExceptionType.connectionTimeout ||
+          dioError.type == DioExceptionType.receiveTimeout) {
+        throw Exception('Tempo de conexão excedido');
+      } else if (dioError.response != null &&
+          dioError.response?.statusCode == 500) {
+        throw Exception('Erro no servidor');
+      } else {
+        throw Exception('Erro ao se comunicar com a API: ${dioError.message}');
+      }
+    } catch (e) {
+      throw Exception('Erro ao buscar municípios');
     }
-
-    final List<CityModel> cities = await _fetchFromApi();
-
-    await _box.put('cities', cities);
-
-    return cities.sublist(
-      start,
-      (start + limit > cities.length) ? cities.length : start + limit,
-    );
   }
 
   Future<List<CityModel>> _fetchFromApi() async {

@@ -26,7 +26,9 @@ class _MunicipioListPageState extends State<MunicipioListPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Municípios')),
+      appBar: AppBar(
+        title: const Text('Municípios'),
+      ),
       body: BlocBuilder<CitiesBloc, CityState>(
         builder: (context, state) {
           if (state.status == CityStatus.loading && state.cities.isEmpty) {
@@ -47,6 +49,7 @@ class _MunicipioListPageState extends State<MunicipioListPage> {
 
               final city = state.cities[index];
               return ListTile(
+                key: ValueKey(city.id),
                 title: Text(city.name),
                 subtitle: Text('${city.state} - ${city.stateAcronym}'),
               );
