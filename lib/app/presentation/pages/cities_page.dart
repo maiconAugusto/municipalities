@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:municipalities/app/presentation/pages/city_details.dart';
 import '../blocs/cities_bloc.dart';
 
 class MunicipioListPage extends StatefulWidget {
@@ -68,6 +69,14 @@ class _MunicipioListPageState extends State<MunicipioListPage> {
                 key: ValueKey(city.id),
                 title: Text(city.name),
                 subtitle: Text('${city.state} - ${city.stateAcronym}'),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => CityDetailsPage(city: city),
+                    ),
+                  );
+                },
               );
             },
           );
