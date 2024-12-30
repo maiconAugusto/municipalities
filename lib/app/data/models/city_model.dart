@@ -1,4 +1,5 @@
 import 'package:hive/hive.dart';
+import 'package:municipalities/app/domain/entities/city_entity.dart';
 
 part 'city_model.g.dart';
 
@@ -57,5 +58,27 @@ class CityModel extends HiveObject {
         },
       },
     };
+  }
+
+  CityEntity toEntity() {
+    return CityEntity(
+      name: name,
+      state: state,
+      stateAcronym: stateAcronym,
+      id: id,
+      microregion: microregion,
+      mesoregion: mesoregion,
+    );
+  }
+
+  factory CityModel.fromEntity(CityEntity entity) {
+    return CityModel(
+      name: entity.name,
+      state: entity.state,
+      stateAcronym: entity.stateAcronym,
+      id: entity.id,
+      microregion: entity.microregion,
+      mesoregion: entity.mesoregion,
+    );
   }
 }
