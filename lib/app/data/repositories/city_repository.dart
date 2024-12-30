@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
 import 'package:hive/hive.dart';
+import 'package:municipalities/app/data/errors/error_mapper.dart';
 import 'package:municipalities/app/domain/entities/city_entity.dart';
 import '../models/city_model.dart';
 
@@ -13,7 +14,7 @@ class CityRepositories {
     required int limit,
   }) async {
     try {
-      if (_box.isNotEmpty) {
+      if (!_box.isNotEmpty) {
         final List<CityModel> cachedCities =
             _box.get('cities', defaultValue: []).cast<CityModel>();
 
@@ -41,31 +42,29 @@ class CityRepositories {
             ? citiesEntity.length
             : start + limit,
       );
-    } on DioException catch (dioError) {
-      if (dioError.type == DioExceptionType.connectionTimeout ||
-          dioError.type == DioExceptionType.receiveTimeout) {
-        throw Exception('Tempo de conexão excedido');
-      } else if (dioError.response != null &&
-          dioError.response?.statusCode == 500) {
-        throw Exception('Erro no servidor');
-      } else {
-        throw Exception('Erro ao se comunicar com o serviço');
-      }
     } catch (e) {
-      throw Exception('Erro ao buscar municípios');
+      throw ErrorMapper.mapError(e);
     }
   }
 
   Future<List<CityModel>> _fetchFromApi() async {
-    final dio = _injector<Dio>();
-    final response = await dio.get("municipios");
-    return (response.data as List)
-        .map((json) => CityModel.fromJson(json))
-        .toList();
+    try {
+      final dio = _injector<Dio>();
+      final response = await dio.get("municipios");
+      return (response.data as List)
+          .map((json) => CityModel.fromJson(json))
+          .toList();
+    } catch (e) {
+      rethrow;
+    }
   }
 
   Future<void> refreshCache() async {
-    final List<CityModel> cities = await _fetchFromApi();
-    await _box.put('cities', cities);
+    try {
+      final List<CityModel> cities = await _fetchFromApi();
+      await _box.put('cities', cities);
+    } catch (e) {
+      rethrow;
+    }
   }
 }
