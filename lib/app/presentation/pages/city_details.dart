@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:municipalities/app/data/models/city_model.dart';
+import 'package:municipalities/app/domain/entities/city_entity.dart';
 
 class CityDetailsPage extends StatelessWidget {
-  final CityModel city;
+  final CityEntity city;
 
   const CityDetailsPage({
     super.key,

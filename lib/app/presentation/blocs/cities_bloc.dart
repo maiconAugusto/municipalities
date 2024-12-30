@@ -1,13 +1,13 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:municipalities/app/data/models/city_model.dart';
+import 'package:municipalities/app/domain/entities/city_entity.dart';
 import 'package:municipalities/app/domain/use_cases/cities_use_case.dart';
 
 enum CityStatus { initial, loading, success, failure }
 
 class CityState {
   final CityStatus status;
-  final List<CityModel> cities;
+  final List<CityEntity> cities;
   final bool hasReachedMax;
   final String? errorMessage;
 
@@ -20,7 +20,7 @@ class CityState {
 
   CityState copyWith({
     CityStatus? status,
-    List<CityModel>? cities,
+    List<CityEntity>? cities,
     bool? hasReachedMax,
     String? errorMessage,
   }) {
