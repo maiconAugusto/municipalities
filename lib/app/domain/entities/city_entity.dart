@@ -14,4 +14,14 @@ class CityEntity {
     required this.microregion,
     required this.mesoregion,
   });
+  CityEntity toEntity() {
+    return CityEntity(
+      id: id,
+      name: name,
+      mesoregion: mesoregion,
+      microregion: microregion,
+      state: state,
+      stateAcronym: stateAcronym,
+    );
+  }
 }
