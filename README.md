@@ -79,6 +79,11 @@ O projeto utiliza o padrão **BLoC (Business Logic Component)** para gerenciar e
    ```bash
    flutter run
    ```
+## Como Executar Tests
+1. Execute o aplicativo:
+   ```bash
+   flutter test
+   ```
 
 ---
 
