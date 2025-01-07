@@ -14,34 +14,23 @@ class CityRepositories {
     required int limit,
   }) async {
     try {
-      if (!_box.isNotEmpty) {
-        final List<CityModel> cachedCities =
-            _box.get('cities', defaultValue: []).cast<CityModel>();
+      if (_box.isNotEmpty) {
+        final cachedCities = _box.get('cities', defaultValue: []) as List;
+        final cachedCitiesEntities = cachedCities
+            .whereType<CityModel>()
+            .map((model) => model.toEntity())
+            .toList();
 
-        final List<CityEntity> cachedCitiesEntities =
-            cachedCities.map((model) => model.toEntity()).toList();
-
-        return cachedCitiesEntities.sublist(
-          start,
-          (start + limit > cachedCitiesEntities.length)
-              ? cachedCitiesEntities.length
-              : start + limit,
-        );
+        return _safeSublist(cachedCitiesEntities, start, limit);
       }
 
       final List<CityModel> cities = await _fetchFromApi();
 
       await _box.put('cities', cities);
 
-      List<CityEntity> citiesEntity =
-          cities.map((model) => model.toEntity()).toList();
+      final citiesEntity = cities.map((model) => model.toEntity()).toList();
 
-      return citiesEntity.sublist(
-        start,
-        (start + limit > citiesEntity.length)
-            ? citiesEntity.length
-            : start + limit,
-      );
+      return _safeSublist(citiesEntity, start, limit);
     } catch (e) {
       throw ErrorMapper.mapError(e);
     }
@@ -55,7 +44,7 @@ class CityRepositories {
           .map((json) => CityModel.fromJson(json))
           .toList();
     } catch (e) {
-      rethrow;
+      throw ErrorMapper.mapError(e);
     }
   }
 
@@ -64,7 +53,13 @@ class CityRepositories {
       final List<CityModel> cities = await _fetchFromApi();
       await _box.put('cities', cities);
     } catch (e) {
-      rethrow;
+      throw ErrorMapper.mapError(e);
     }
+  }
+
+  List<T> _safeSublist<T>(List<T> list, int start, int limit) {
+    final end = (start + limit > list.length) ? list.length : start + limit;
+    if (start < 0 || start >= list.length) return [];
+    return list.sublist(start, end);
   }
 }
